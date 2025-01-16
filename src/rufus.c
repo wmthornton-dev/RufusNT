@@ -408,7 +408,6 @@ static BOOL IsRefsAvailable(MEDIA_TYPE MediaType)
 		return FALSE;
 	if (WindowsVersion.Version < WINDOWS_8_1 || WindowsVersion.BuildNumber <= 0)
 		return FALSE;
-	// Per https://gist.github.com/0xbadfca11/da0598e47dd643d933dc
 	if (WindowsVersion.BuildNumber < 16226)
 		return TRUE;
 	switch (WindowsVersion.Edition) {
@@ -946,7 +945,7 @@ BOOL CALLBACK LogCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	LONG_PTR style;
 	DWORD log_size;
 	char *log_buffer = NULL, *filepath;
-	EXT_DECL(log_ext, "rufus.log", __VA_GROUP__("*.log"), __VA_GROUP__("Rufus log"));
+	EXT_DECL(log_ext, "rufusNT.log", __VA_GROUP__("*.log"), __VA_GROUP__("Rufus log"));
 	switch (message) {
 	case WM_INITDIALOG:
 		apply_localization(IDD_LOG, hDlg);
@@ -2271,7 +2270,7 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 				return (INT_PTR)TRUE;
 			}
 
-			// Save or append the current log to %LocalAppData%\Rufus\rufus.log
+			// Save or append the current log to %LocalAppData%\Rufus\rufusNT.log
 			log_size = GetWindowTextLengthU(hLog);
 			if ((!user_deleted_rufus_dir) && (log_size > 0) && ((log_buffer = (char*)malloc(log_size + 2)) != NULL)) {
 				log_size = GetDlgItemTextU(hLogDialog, IDC_LOG_EDIT, log_buffer, log_size);
@@ -2284,7 +2283,7 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 					IGNORE_RETVAL(_chdirU(app_data_dir));
 					IGNORE_RETVAL(_mkdir(FILES_DIR));
 					IGNORE_RETVAL(_chdir(FILES_DIR));
-					FileIO(persistent_log ? FILE_IO_APPEND : FILE_IO_WRITE, "rufus.log", &log_buffer, &log_size);
+					FileIO(persistent_log ? FILE_IO_APPEND : FILE_IO_WRITE, "rufusNT.log", &log_buffer, &log_size);
 				}
 				safe_free(log_buffer);
 			}
@@ -2538,7 +2537,7 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 					img_provided = FALSE;	// One off thing...
 				} else {
 					char* old_image_path = image_path;
-					char extensions[128] = "*.iso;*.img;*.vhd;*.vhdx;*.usb;*.bz2;*.bzip2;*.gz;*.lzma;*.xz;*.Z;*.zip;*.zst;*.wic;*.wim;*.esd;*.vtsi";
+					char extensions[128] = "*.iso;*.img;*.vhd;*.vhdx;*.usb;*.dmg;*.bz2;*.bzip2;*.gz;*.lzma;*.xz;*.Z;*.zip;*.zst;*.wic;*.wim;*.esd;*.vtsi";
 					if (has_ffu_support)
 						strcat(extensions, ";*.ffu");
 					// If declared globaly, lmprintf(MSG_280) would be called on each message...
@@ -3110,7 +3109,7 @@ static INT_PTR CALLBACK MainCallback(HWND hDlg, UINT message, WPARAM wParam, LPA
 							}
 							if (i == ARRAYSIZE(ps_cmd)) {
 								uprintf("\r\nWARNING: 'Controlled Folder Access' appears to be enabled on this system");
-								uprintf("You may need to disable this feature, or add an exception, for Rufus to to work...\n");
+								uprintf("You may need to disable this feature, or add an exception, for RufusNT to to work...\n");
 							}
 						}
 						break;
